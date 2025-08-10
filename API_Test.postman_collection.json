@@ -1,0 +1,782 @@
+{
+	"info": {
+		"_postman_id": "3e8bb922-ab7e-4243-bdb9-819373b16938",
+		"name": "API_Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4544775"
+	},
+	"item": [
+		{
+			"name": "Verify_user_can_generate_access_token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Parse response body\r",
+							"let response = pm.response.json();\r",
+							"let jsonData = pm.response.json();\r",
+							"\r",
+							"pm.environment.set(\"accessToken\", jsonData.accessToken);\r",
+							"pm.environment.set(\"refreshToken\", jsonData.refreshToken);\r",
+							"\r",
+							"// Performance test to measure the response time\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"// Status code check\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Access Token test\r",
+							"pm.test(\"Access Token is present and valid\", function () {\r",
+							"    pm.expect(jsonData.accessToken).to.be.a('string').and.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Refresh Token test\r",
+							"pm.test(\"Refresh Token is present and valid\", function () {\r",
+							"    pm.expect(jsonData.refreshToken).to.be.a('string').and.not.empty;\r",
+							"});\r",
+							"\r",
+							"// ID test\r",
+							"pm.test(\"ID is correct\", function () {\r",
+							"    pm.expect(jsonData.id).to.be.a('number').and.not.be.null;\r",
+							"});\r",
+							"\r",
+							"// Username test\r",
+							"pm.test(\"Username is correct\", function () {\r",
+							"    pm.expect(jsonData.username).to.be.a('string').and.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Email test\r",
+							"pm.test(\"Email is correct\", function () {\r",
+							"    pm.expect(jsonData.email).to.be.a('string').and.not.empty;\r",
+							"});\r",
+							"\r",
+							"// First name test\r",
+							"pm.test(\"First name is correct\", function () {\r",
+							"    pm.expect(jsonData.firstName).to.be.a('string').and.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Last name test\r",
+							"pm.test(\"Last name is correct\", function () {\r",
+							"    pm.expect(jsonData.lastName).to.be.a('string').and.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Gender test (remove expectedGender if undefined or define it above)\r",
+							"pm.test(\"Gender is correct\", function () {\r",
+							"    pm.expect(jsonData.gender).to.be.a('string').and.not.empty;\r",
+							"    });"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"username\", \"emilys\");\r",
+							"pm.collectionVariables.set(\"password\", \"emilyspass\");\r",
+							"pm.collectionVariables.set(\"expiresInMins\", 30);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Cookie",
+						"value": "cookies.txt"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"{{username}}\",\r\n    \"password\": \"{{password}}\",\r\n    \"expiresInMins\": {{expiresInMins}}\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dummyjson.com/auth/login",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"auth",
+						"login"
+					]
+				},
+				"description": "Generated from cURL: curl --location 'https://dummyjson.com/auth/login' \\\r\n--header 'Content-Type: application/json' \\\r\n--cookie-jar cookies.txt \\\r\n--cookie cookies.txt \\\r\n--request POST \\\r\n--data-raw '{\r\n    \"username\": \"emilys\",\r\n    \"password\": \"emilyspass\",\r\n    \"expiresInMins\": 30\r\n}'"
+			},
+			"response": []
+		},
+		{
+			"name": "Verify_user_can_fetch_product_details",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const limit = Math.floor(Math.random() * 50) + 1;\r",
+							"pm.collectionVariables.set(\"limit\", limit);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.response.to.have.responseTime.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response structure is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    // Validate the 'products' array\r",
+							"    pm.expect(jsonData).to.have.property('products').that.is.an('array').with.lengthOf.above(0);\r",
+							"    \r",
+							"    // Validate the first product object\r",
+							"    var product = jsonData.products[0];\r",
+							"    \r",
+							"    pm.expect(product).to.have.property('id').that.is.a('number');\r",
+							"    pm.expect(product).to.have.property('title').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('description').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('category').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('price').that.is.a('number');\r",
+							"    pm.expect(product).to.have.property('discountPercentage').that.is.a('number');\r",
+							"    pm.expect(product).to.have.property('rating').that.is.a('number');\r",
+							"    pm.expect(product).to.have.property('stock').that.is.a('number');\r",
+							"    pm.expect(product).to.have.property('tags').that.is.an('array');\r",
+							"    pm.expect(product).to.have.property('brand').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('sku').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('weight').that.is.a('number');\r",
+							"    pm.expect(product).to.have.property('dimensions').that.is.an('object');\r",
+							"    pm.expect(product).to.have.property('warrantyInformation').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('shippingInformation').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('availabilityStatus').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('reviews').that.is.an('array');\r",
+							"    pm.expect(product).to.have.property('returnPolicy').that.is.a('string');\r",
+							"    pm.expect(product).to.have.property('minimumOrderQuantity').that.is.a('number');\r",
+							"    pm.expect(product).to.have.property('meta').that.is.an('object');\r",
+							"    pm.expect(product).to.have.property('images').that.is.an('array');\r",
+							"    pm.expect(product).to.have.property('thumbnail').that.is.a('string');\r",
+							"\r",
+							"    // Validate the reviews array and its items\r",
+							"    var reviews = product.reviews;\r",
+							"    pm.expect(reviews).to.have.lengthOf.above(0);\r",
+							"    reviews.forEach(function(review) {\r",
+							"        pm.expect(review).to.have.property('rating').that.is.a('number');\r",
+							"        pm.expect(review).to.have.property('comment').that.is.a('string');\r",
+							"        pm.expect(review).to.have.property('date').that.is.a('string');\r",
+							"        pm.expect(review).to.have.property('reviewerName').that.is.a('string');\r",
+							"        pm.expect(review).to.have.property('reviewerEmail').that.is.a('string');\r",
+							"    });\r",
+							"\r",
+							"    // Validate pagination information\r",
+							"    pm.expect(jsonData).to.have.property('total').that.is.a('number');\r",
+							"    pm.expect(jsonData).to.have.property('skip').that.is.a('number');\r",
+							"    pm.expect(jsonData).to.have.property('limit').that.is.a('number');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Pagination is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"\r",
+							"    // Validate that limit is within bounds\r",
+							"    pm.expect(jsonData.limit).to.be.above(0);\r",
+							"    pm.expect(jsonData.limit).to.be.below(jsonData.total);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://dummyjson.com/products?limit={{limit}}",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl --location 'https://dummyjson.com/products'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Veirfy_by_passing_0_as_limit",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const limit = 0;\r",
+							"pm.collectionVariables.set(\"limit\", limit);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.response.to.have.responseTime.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response structure is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.null\r",
+							"\r",
+							"});\r",
+							"    \r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "https://dummyjson.com/products?limit={{limit}}",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "{{limit}}"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl --location 'https://dummyjson.com/products'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Verify_user_can_add_multiple_products_to_cart",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"// Generate a random userId between 1 and 10\r",
+							"const userId = Math.floor(Math.random() * 10) + 1; // Random userId between 1 and 10\r",
+							"\r",
+							"// Generate random quantities for the products (between 1 and 5)\r",
+							"const quantity1 = Math.floor(Math.random() * 5) + 1; // Random quantity between 1 and 5 for product 1\r",
+							"const quantity2 = Math.floor(Math.random() * 5) + 1; \r",
+							"\r",
+							"\r",
+							"pm.collectionVariables.set(\"userId\", userId);\r",
+							"pm.collectionVariables.set(\"quantity1\", quantity1);\r",
+							"pm.collectionVariables.set(\"quantity2\", quantity2);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// Performance test to measure the response time\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Cart is created successfully\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    \r",
+							"    // Validate if 'id' and 'userId' are present and are numbers\r",
+							"    pm.expect(jsonData).to.have.property('id').that.is.a('number');\r",
+							"    pm.expect(jsonData).to.have.property('userId').that.is.a('number');\r",
+							"    \r",
+							"    // Validate the structure of 'products'\r",
+							"    pm.expect(jsonData).to.have.property('products').that.is.an('array').with.length.above(0);\r",
+							"    pm.expect(jsonData).to.have.property('total').that.is.a('number');\r",
+							"    pm.expect(jsonData).to.have.property('discountedTotal').that.is.a('number');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Total price is calculated correctly\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    \r",
+							"    // Validate the total price\r",
+							"    var expectedTotalPrice = 0;\r",
+							"    jsonData.products.forEach(product => {\r",
+							"        expectedTotalPrice += product.total;\r",
+							"    });\r",
+							"\r",
+							"    pm.expect(jsonData.total).to.eql(expectedTotalPrice);\r",
+							"    \r",
+							"    // Validate the discounted total\r",
+							"    var expectedDiscountedTotal = 0;\r",
+							"    jsonData.products.forEach(product => {\r",
+							"        expectedDiscountedTotal += product.discountedPrice; \r",
+							"    });\r",
+							"\r",
+							"    pm.expect(jsonData.discountedTotal).to.eql(expectedDiscountedTotal);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"userId\": {{userId}},\r\n\"products\": [\r\n{ \"id\": 1, \"quantity\": {{quantity1}} },\r\n{ \"id\": 2, \"quantity\": {{quantity2}} }\r\n]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dummyjson.com/carts/add",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"carts",
+						"add"
+					]
+				},
+				"description": "Generated from cURL: curl --location 'https://dummyjson.com/carts/add' \\\r\n--header 'Content-Type: application/json' \\\r\n--request POST \\\r\n--data-raw '{\r\n    \"userId\": 1,\r\n    \"products\": [\r\n        {\r\n            \"id\": 144,\r\n            \"quantity\": 4\r\n        },\r\n        {\r\n            \"id\": 98,\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Verify_adding_product_to_cart_with_missing_userId",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validate error message for missing user id\", function () {\r",
+							"    let expected_message = \"Expected property name or '}' in JSON at position 13\"\r",
+							"    // Check if the response code is 400\r",
+							"    pm.expect(pm.response.code).to.equal(400);\r",
+							"    \r",
+							"    // Validate the error message for malformed JSON\r",
+							"    pm.expect(pm.response.json().message).to.include(expected_message);\r",
+							"});\r",
+							"\r",
+							"// Performance test to measure the response time\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"// Generate random quantities for the products (between 1 and 5)\r",
+							"const quantity1 = Math.floor(Math.random() * 5) + 1; // Random quantity between 1 and 5 for product 1\r",
+							"const quantity2 = Math.floor(Math.random() * 5) + 1; \r",
+							"\r",
+							"\r",
+							"pm.collectionVariables.unset(\"userId\");\r",
+							"pm.collectionVariables.set(\"quantity1\", quantity1);\r",
+							"pm.collectionVariables.set(\"quantity2\", quantity2);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"userId\":{{userId}} ,\r\n\"products\": [\r\n{ \"id\": 1, \"quantity\": {{quantity1}} },\r\n{ \"id\": 2, \"quantity\": {{quantity2}} }\r\n]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dummyjson.com/carts/add",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"carts",
+						"add"
+					]
+				},
+				"description": "Generated from cURL: curl --location 'https://dummyjson.com/carts/add' \\\r\n--header 'Content-Type: application/json' \\\r\n--request POST \\\r\n--data-raw '{\r\n    \"userId\": 1,\r\n    \"products\": [\r\n        {\r\n            \"id\": 144,\r\n            \"quantity\": 4\r\n        },\r\n        {\r\n            \"id\": 98,\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Verify_adding_product_to_cart_with_missing_products",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"// Generate random quantities for the products (between 1 and 5)\r",
+							"const quantity1 = Math.floor(Math.random() * 5) + 1; // Random quantity between 1 and 5 for product 1\r",
+							"const quantity2 = Math.floor(Math.random() * 5) + 1; \r",
+							"\r",
+							"\r",
+							"pm.collectionVariables.unset(\"userId\");\r",
+							"pm.collectionVariables.set(\"quantity1\", quantity1);\r",
+							"pm.collectionVariables.set(\"quantity2\", quantity2);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validate error message for missing product details\", function () {\r",
+							"    let expected_message = \"Expected property name or '}' in JSON at position 13\"\r",
+							"    // Check if the response code is 400\r",
+							"    pm.expect(pm.response.code).to.equal(400);\r",
+							"    \r",
+							"    // Validate the error message for malformed JSON\r",
+							"    pm.expect(pm.response.json().message).to.include(expected_message);\r",
+							"});\r",
+							"\r",
+							"// Performance test to measure the response time\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\"userId\":{{userId}} ,\r\n\"products\": [\r\n]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://dummyjson.com/carts/add",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"carts",
+						"add"
+					]
+				},
+				"description": "Generated from cURL: curl --location 'https://dummyjson.com/carts/add' \\\r\n--header 'Content-Type: application/json' \\\r\n--request POST \\\r\n--data-raw '{\r\n    \"userId\": 1,\r\n    \"products\": [\r\n        {\r\n            \"id\": 144,\r\n            \"quantity\": 4\r\n        },\r\n        {\r\n            \"id\": 98,\r\n            \"quantity\": 1\r\n        }\r\n    ]\r\n}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Verify_user_can_search_product_with_product_name",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"product\", \"laptop\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate that the status code is 200 (OK)\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Validate that the response contains a list of products\r",
+							"pm.test(\"Response contains products\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.products).to.be.an('array').that.is.not.empty;\r",
+							"    pm.expect(jsonData).to.have.property('total').that.is.a('number');\r",
+							"    pm.expect(jsonData).to.have.property('skip').that.is.a('number');\r",
+							"    pm.expect(jsonData).to.have.property('limit').that.is.a('number');\r",
+							"});\r",
+							"\r",
+							"// Validate that the products have the expected fields\r",
+							"pm.test(\"Each product has the required fields\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    jsonData.products.forEach(function (product) {\r",
+							"        pm.expect(product).to.have.property('id').that.is.a('number');\r",
+							"        pm.expect(product).to.have.property('title').that.is.a('string');\r",
+							"        pm.expect(product).to.have.property('description').that.is.a('string');\r",
+							"        pm.expect(product).to.have.property('price').that.is.a('number');\r",
+							"        pm.expect(product).to.have.property('category').that.is.a('string');\r",
+							"        pm.expect(product).to.have.property('rating').that.is.a('number');\r",
+							"        pm.expect(product).to.have.property('stock').that.is.a('number');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"// Performance test to measure the response time\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dummyjson.com/products/search?q={{product}}",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"products",
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "{{product}}"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl --location 'https://dummyjson.com/products/search?q=phone'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Verify_user_can_search_product_with_invalid_product_name",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"product\", \"a\");"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Validate that the status code is 200 (OK)\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Validate that the response proper error message\r",
+							"pm.test(\"Response structure is valid\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.null\r",
+							"\r",
+							"});\r",
+							"\r",
+							"// Performance test to measure the response time\r",
+							"pm.test(\"Response time is less than 1000ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(1000);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://dummyjson.com/products/search?q={{product}}",
+					"protocol": "https",
+					"host": [
+						"dummyjson",
+						"com"
+					],
+					"path": [
+						"products",
+						"search"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "{{product}}"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl --location 'https://dummyjson.com/products/search?q=phone'\r\n"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "emily",
+			"value": "emily",
+			"type": "default"
+		},
+		{
+			"key": "emilyspass",
+			"value": "emilyspass",
+			"type": "default"
+		},
+		{
+			"key": "username",
+			"value": ""
+		},
+		{
+			"key": "password",
+			"value": ""
+		},
+		{
+			"key": "expiresInMins",
+			"value": ""
+		},
+		{
+			"key": "limit",
+			"value": ""
+		},
+		{
+			"key": "skip",
+			"value": ""
+		},
+		{
+			"key": "quantity1",
+			"value": ""
+		},
+		{
+			"key": "quantity2",
+			"value": ""
+		},
+		{
+			"key": "product",
+			"value": ""
+		},
+		{
+			"key": "cartPayload",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		}
+	]
+}
